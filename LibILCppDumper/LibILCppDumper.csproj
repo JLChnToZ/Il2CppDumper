@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Il2CppDumper</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Il2CppDumper\ArmHelper.cs" Link="ArmHelper.cs" />
+    <Compile Include="..\Il2CppDumper\Attributes.cs" Link="Attributes.cs" />
+    <Compile Include="..\Il2CppDumper\Config.cs" Link="Config.cs" />
+    <Compile Include="..\Il2CppDumper\DefineConstants.cs" Link="DefineConstants.cs" />
+    <Compile Include="..\Il2CppDumper\DummyAssemblyCreator.cs" Link="DummyAssemblyCreator.cs" />
+    <Compile Include="..\Il2CppDumper\Elf.cs" Link="Elf.cs" />
+    <Compile Include="..\Il2CppDumper\Elf64.cs" Link="Elf64.cs" />
+    <Compile Include="..\Il2CppDumper\Elf64Class.cs" Link="Elf64Class.cs" />
+    <Compile Include="..\Il2CppDumper\ElfClass.cs" Link="ElfClass.cs" />
+    <Compile Include="..\Il2CppDumper\Il2Cpp.cs" Link="Il2Cpp.cs" />
+    <Compile Include="..\Il2CppDumper\Il2CppClass.cs" Link="Il2CppClass.cs" />
+    <Compile Include="..\Il2CppDumper\Macho.cs" Link="Macho.cs" />
+    <Compile Include="..\Il2CppDumper\Macho64.cs" Link="Macho64.cs" />
+    <Compile Include="..\Il2CppDumper\MachoClass.cs" Link="MachoClass.cs" />
+    <Compile Include="..\Il2CppDumper\MachoFat.cs" Link="MachoFat.cs" />
+    <Compile Include="..\Il2CppDumper\Metadata.cs" Link="Metadata.cs" />
+    <Compile Include="..\Il2CppDumper\MetadataClass.cs" Link="MetadataClass.cs" />
+    <Compile Include="..\Il2CppDumper\MyBinaryReader.cs" Link="MyBinaryReader.cs" />
+    <Compile Include="..\Il2CppDumper\PE.cs" Link="PE.cs" />
+    <Compile Include="..\Il2CppDumper\PEClass.cs" Link="PEClass.cs" />
+    <Compile Include="..\Il2CppDumper\PlusSearch.cs" Link="PlusSearch.cs" />
+    <Compile Include="..\Il2CppDumper\Resource1.Designer.cs" Link="Resource1.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\Il2CppDumper\Resource1.resx" Link="Resource1.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.1" />
+    <PackageReference Include="SharpZipLib" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>

@@ -80,7 +80,7 @@ namespace Il2CppDumper
                 {
                     var interfaceType = il2cpp.types[metadata.interfaceIndices[typeDef.interfacesStart + i]];
                     var interfaceTypeRef = GetTypeReference(typeDefinition, interfaceType);
-                    typeDefinition.Interfaces.Add(interfaceTypeRef);
+                    typeDefinition.Interfaces.Add(new InterfaceImplementation(interfaceTypeRef));
                 }
             }
             //处理field, method, property等等
@@ -111,7 +111,7 @@ namespace Il2CppDumper
                     var fieldOffset = il2cpp.GetFieldOffsetFromIndex(index, i - typeDef.fieldStart, i);
                     if (fieldOffset > 0)
                     {
-                        var customAttribute = new CustomAttribute(typeDefinition.Module.Import(fieldOffsetAttribute));
+                        var customAttribute = new CustomAttribute(typeDefinition.Module.ImportReference(fieldOffsetAttribute));
                         var offset = new CustomAttributeNamedArgument("Offset", new CustomAttributeArgument(stringType, $"0x{fieldOffset:X}"));
                         customAttribute.Fields.Add(offset);
                         fieldDefinition.CustomAttributes.Add(customAttribute);
@@ -124,7 +124,7 @@ namespace Il2CppDumper
                     var methodDef = metadata.methodDefs[i];
                     var methodReturnType = il2cpp.types[methodDef.returnType];
                     var methodName = metadata.GetStringFromIndex(methodDef.nameIndex);
-                    var methodDefinition = new MethodDefinition(methodName, (MethodAttributes)methodDef.flags, typeDefinition.Module.Import(typeof(void)));
+                    var methodDefinition = new MethodDefinition(methodName, (MethodAttributes)methodDef.flags, typeDefinition.Module.ImportReference(typeof(void)));
                     typeDefinition.Methods.Add(methodDefinition);
                     methodDefinition.ReturnType = GetTypeReference(methodDefinition, methodReturnType);
                     if (methodDefinition.HasBody && typeDefinition.BaseType?.FullName != "System.MulticastDelegate")
@@ -177,7 +177,7 @@ namespace Il2CppDumper
                     }
                     if (methodPointer > 0)
                     {
-                        var customAttribute = new CustomAttribute(typeDefinition.Module.Import(addressAttribute));
+                        var customAttribute = new CustomAttribute(typeDefinition.Module.ImportReference(addressAttribute));
                         var rva = new CustomAttributeNamedArgument("RVA", new CustomAttributeArgument(stringType, $"0x{methodPointer:X}"));
                         var offset = new CustomAttributeNamedArgument("Offset", new CustomAttributeArgument(stringType, $"0x{il2cpp.MapVATR(methodPointer):X}"));
                         customAttribute.Fields.Add(rva);
@@ -272,7 +272,7 @@ namespace Il2CppDumper
                                 var attributeName = metadata.GetStringFromIndex(klass.nameIndex);
                                 if (attributeName == "SerializeField")
                                 {
-                                    var customAttribute = new CustomAttribute(typeDefinition.Module.Import(serializeField));
+                                    var customAttribute = new CustomAttribute(typeDefinition.Module.ImportReference(serializeField));
                                     fieldDefinition.CustomAttributes.Add(customAttribute);
                                 }
                             }
@@ -288,46 +288,46 @@ namespace Il2CppDumper
             switch (pType.type)
             {
                 case Il2CppTypeEnum.IL2CPP_TYPE_OBJECT:
-                    return moduleDefinition.Import(typeof(Object));
+                    return moduleDefinition.ImportReference(typeof(Object));
                 case Il2CppTypeEnum.IL2CPP_TYPE_VOID:
-                    return moduleDefinition.Import(typeof(void));
+                    return moduleDefinition.ImportReference(typeof(void));
                 case Il2CppTypeEnum.IL2CPP_TYPE_BOOLEAN:
-                    return moduleDefinition.Import(typeof(Boolean));
+                    return moduleDefinition.ImportReference(typeof(Boolean));
                 case Il2CppTypeEnum.IL2CPP_TYPE_CHAR:
-                    return moduleDefinition.Import(typeof(Char));
+                    return moduleDefinition.ImportReference(typeof(Char));
                 case Il2CppTypeEnum.IL2CPP_TYPE_I1:
-                    return moduleDefinition.Import(typeof(SByte));
+                    return moduleDefinition.ImportReference(typeof(SByte));
                 case Il2CppTypeEnum.IL2CPP_TYPE_U1:
-                    return moduleDefinition.Import(typeof(Byte));
+                    return moduleDefinition.ImportReference(typeof(Byte));
                 case Il2CppTypeEnum.IL2CPP_TYPE_I2:
-                    return moduleDefinition.Import(typeof(Int16));
+                    return moduleDefinition.ImportReference(typeof(Int16));
                 case Il2CppTypeEnum.IL2CPP_TYPE_U2:
-                    return moduleDefinition.Import(typeof(UInt16));
+                    return moduleDefinition.ImportReference(typeof(UInt16));
                 case Il2CppTypeEnum.IL2CPP_TYPE_I4:
-                    return moduleDefinition.Import(typeof(Int32));
+                    return moduleDefinition.ImportReference(typeof(Int32));
                 case Il2CppTypeEnum.IL2CPP_TYPE_U4:
-                    return moduleDefinition.Import(typeof(UInt32));
+                    return moduleDefinition.ImportReference(typeof(UInt32));
                 case Il2CppTypeEnum.IL2CPP_TYPE_I:
-                    return moduleDefinition.Import(typeof(IntPtr));
+                    return moduleDefinition.ImportReference(typeof(IntPtr));
                 case Il2CppTypeEnum.IL2CPP_TYPE_U:
-                    return moduleDefinition.Import(typeof(UIntPtr));
+                    return moduleDefinition.ImportReference(typeof(UIntPtr));
                 case Il2CppTypeEnum.IL2CPP_TYPE_I8:
-                    return moduleDefinition.Import(typeof(Int64));
+                    return moduleDefinition.ImportReference(typeof(Int64));
                 case Il2CppTypeEnum.IL2CPP_TYPE_U8:
-                    return moduleDefinition.Import(typeof(UInt64));
+                    return moduleDefinition.ImportReference(typeof(UInt64));
                 case Il2CppTypeEnum.IL2CPP_TYPE_R4:
-                    return moduleDefinition.Import(typeof(Single));
+                    return moduleDefinition.ImportReference(typeof(Single));
                 case Il2CppTypeEnum.IL2CPP_TYPE_R8:
-                    return moduleDefinition.Import(typeof(Double));
+                    return moduleDefinition.ImportReference(typeof(Double));
                 case Il2CppTypeEnum.IL2CPP_TYPE_STRING:
-                    return moduleDefinition.Import(typeof(String));
+                    return moduleDefinition.ImportReference(typeof(String));
                 case Il2CppTypeEnum.IL2CPP_TYPE_TYPEDBYREF:
-                    return moduleDefinition.Import(typeof(TypedReference));
+                    return moduleDefinition.ImportReference(typeof(TypedReference));
                 case Il2CppTypeEnum.IL2CPP_TYPE_CLASS:
                 case Il2CppTypeEnum.IL2CPP_TYPE_VALUETYPE:
                     {
                         var typeDefinition = typeDefinitionDic[pType.data.klassIndex];
-                        return moduleDefinition.Import(typeDefinition);
+                        return moduleDefinition.ImportReference(typeDefinition);
                     }
                 case Il2CppTypeEnum.IL2CPP_TYPE_ARRAY:
                     {
@@ -339,7 +339,7 @@ namespace Il2CppDumper
                     {
                         var generic_class = il2cpp.MapVATR<Il2CppGenericClass>(pType.data.generic_class);
                         var typeDefinition = typeDefinitionDic[generic_class.typeDefinitionIndex];
-                        var genericInstanceType = new GenericInstanceType(moduleDefinition.Import(typeDefinition));
+                        var genericInstanceType = new GenericInstanceType(moduleDefinition.ImportReference(typeDefinition));
                         var pInst = il2cpp.MapVATR<Il2CppGenericInst>(generic_class.context.class_inst);
                         var pointers = il2cpp.GetPointers(pInst.type_argv, (long)pInst.type_argc);
                         foreach (var pointer in pointers)
@@ -394,7 +394,7 @@ namespace Il2CppDumper
                         return new PointerType(GetTypeReference(memberReference, type));
                     }
                 default:
-                    return moduleDefinition.Import(typeof(Object));
+                    return moduleDefinition.ImportReference(typeof(Object));
             }
         }
 

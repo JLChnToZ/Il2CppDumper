@@ -7,5 +7,6 @@
   "DummyDll": true,
   "MakeFunction": false,
   "ForceIl2CppVersion": false,
-  "ForceVersion": 16
+  "ForceVersion": 16,
+  "PreferredMachoVersion": 0
 }

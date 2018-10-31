@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Il2CppDumper
 {
-    class Config
+    public class Config
     {
         public bool DumpMethod = true;
         public bool DumpField = true;
@@ -16,5 +16,12 @@ namespace Il2CppDumper
         public bool MakeFunction = false;
         public bool ForceIl2CppVersion = false;
         public int ForceVersion = 16;
+        public MachoVersion PreferredMachoVersion = MachoVersion.Macho64;
+    }
+
+    public enum MachoVersion
+    {
+        Macho32,
+        Macho64,
     }
 }
