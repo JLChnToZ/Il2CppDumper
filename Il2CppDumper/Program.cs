@@ -1,60 +1,39 @@
 ﻿using System;
-using System.IO;
-using System.Windows.Forms;
-using System.Web.Script.Serialization;
+using CommandLine;
 
 namespace Il2CppDumper {
     class Program {
-        [STAThread]
         static void Main(string[] args) {
-            var config = File.Exists("config.json") ?
-                new JavaScriptSerializer().Deserialize<Config>(File.ReadAllText("config.json")) :
-                new Config();
-            var ofd = new OpenFileDialog();
-            var sfd = new SaveFileDialog();
-            var sfd2 = new FolderBrowserDialog();
-            Stream outStream = null, scriptStream = null;
+            Parser.Default.ParseArguments<CliOptions>(args).WithParsed(Run);
+        }
 
-            ofd.Filter = "ELF file or Mach-O file|*.*|APK File (*.apk;.zip)|*.apk;*.zip";
-            if (ofd.ShowDialog() != DialogResult.OK) return;
+        private static void Run(CliOptions options) {
+            var config = options.ToConfig();
+
             IL2CppDump dumper = null;
-            var il2cppfile = File.OpenRead(ofd.FileName);
+            var il2cppfile = options.IL2CppPath.OpenRead();
 
-            if(ofd.FilterIndex == 2) {
+            if (options.MetaFilePath == null)
                 dumper = IL2CppDump.FromAPK(il2cppfile, config);
-            } else {
-                ofd.Filter = "global-metadata|global-metadata.dat";
-                if (ofd.ShowDialog() != DialogResult.OK) return;
-                dumper = new IL2CppDump(il2cppfile, File.OpenRead(ofd.FileName), config);
-            }
+            else
+                dumper = new IL2CppDump(il2cppfile, options.MetaFilePath.OpenRead(), config);
 
             Console.WriteLine("Initializing metadata...");
-            Console.WriteLine("Select Mode: 1.Manual 2.Auto 3.Auto(Advanced) 4.Auto(Plus) 5.Auto(Symbol)");
-            DumpMode mode = (DumpMode)(int.Parse(Console.ReadKey(true).KeyChar.ToString()) - 1);
-            ulong codeRegistration = 0L, metadataRegistration = 0L;
-            if(mode == DumpMode.Manual) {
-                Console.Write("Input CodeRegistration: ");
-                codeRegistration = Convert.ToUInt64(Console.ReadLine(), 16);
-                Console.Write("Input MetadataRegistration: ");
-                metadataRegistration = Convert.ToUInt64(Console.ReadLine(), 16);
-            }
-            if (!dumper.Parse(mode, codeRegistration, metadataRegistration)) {
+
+            if (!dumper.Parse((DumpMode)options.Mode, options.CodeRegistration, options.MetadataRegistration)) {
                 Console.WriteLine("Failed to parse");
                 return;
             }
-            sfd.Filter = "C-Sharp (*.cs)|*.cs|All Files (*.*)|*.*";
-            if (sfd.ShowDialog() != DialogResult.OK) return;
-            outStream = File.OpenWrite(sfd.FileName);
-            sfd.Filter = "IDL Script (*.py)|*.py|All Files (*.*)|*.*";
-            if (sfd.ShowDialog() == DialogResult.OK)
-                scriptStream = File.OpenWrite(sfd.FileName);
-            dumper.DumpEverything(outStream, scriptStream);
 
-            if(sfd2.ShowDialog() == DialogResult.OK)
-                dumper.DumpDummyDll(sfd2.SelectedPath);
+            Console.WriteLine("Start dump...");
+            dumper.DumpEverything(options.OutputPath.OpenWrite(), options.IDAPath?.OpenWrite());
 
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey(true);
+            if (options.DummyPath != null) {
+                Console.WriteLine("Start dump dummy DLL files...");
+                dumper.DumpDummyDll(options.DummyPath.FullName);
+            }
+
+            Console.WriteLine("Done");
         }
     }
 }
